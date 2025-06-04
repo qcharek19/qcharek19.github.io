@@ -7,7 +7,11 @@ const ASSETS = {
     ],
     startScreen: 'assets/theme.png',
     theme2: 'assets/theme2.png',
-    
+    levelInscriptions: [
+        'assets/level1.png',
+        'assets/level2.png',
+        'assets/level3.png',
+    ],
     characters: [
         'assets/character1.png',
         'assets/character2.png',
