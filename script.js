@@ -528,6 +528,17 @@ if (isMobile) {
         }
         isLongPress = false;
     };
+
+    // Heavy Attack button (always triggers strong attack)
+    const btnHeavy = document.getElementById('btn-heavy');
+    if (btnHeavy) {
+        btnHeavy.ontouchstart = () => {
+            controls.left.strongAttack = true;
+        };
+        btnHeavy.ontouchend = () => {
+            controls.left.strongAttack = false;
+        };
+    }
     
     canvas.addEventListener('touchstart', () => {
         if (gameState === 'start') {
