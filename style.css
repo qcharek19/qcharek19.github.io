@@ -124,15 +124,21 @@ body {
         min-height: 300px;
     }
     #mobile-controls {
-        position: static;
-        width: 100%;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
         display: flex;
         flex-direction: row;
         justify-content: center;
         align-items: center;
         gap: 10px;
-        margin-top: 12px;
-        z-index: 10;
+        padding: 10px 0 18px 0;
+        background: rgba(24, 24, 24, 0.98);
+        box-shadow: 0 -2px 12px rgba(0,0,0,0.18);
+        z-index: 10000;
+        margin-top: 0;
     }
     #mobile-controls button {
         font-size: 1em;
