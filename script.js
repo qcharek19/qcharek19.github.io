@@ -95,7 +95,8 @@ class Player {
         this.characterIndex = characterIndex;
         this.x = x;
         this.y = y;
-        this.width = 120;
+        // Make character 2 (index 1) wider than others
+        this.width = characterIndex === 1 ? 160 : 120;
         this.height = 240;
         this.facing = facing;
         this.controls = controls;
