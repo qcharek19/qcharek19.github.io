@@ -10,6 +10,12 @@ body {
     min-height: 100vh;
 }
 
+@media (max-width: 600px) {
+  #legend {
+    display: none !important;
+  }
+}
+
 #game-container {
     position: relative;
     width: 1280px;
