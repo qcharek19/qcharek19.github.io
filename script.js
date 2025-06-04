@@ -60,6 +60,7 @@ const winSound = document.getElementById('win-sound');
 let winRoundSound = null;
 let fightSound = null;
 const mobileControls = document.getElementById('mobile-controls');
+const mobileControlsSplit = document.getElementById('mobile-controls-split');
 
 let gameState = 'start';
 let currentLevel = 0;
@@ -576,12 +577,27 @@ window.addEventListener('keyup', (e) => {
     }
 });
 
-if (isMobile) {
-    mobileControls.style.display = 'flex';
+function updateMobileControlsVisibility() {
+    if (!isMobile) return;
+    
+    const isLandscape = window.innerWidth > window.innerHeight;
+    
+    if (isLandscape) {
+        mobileControls.style.display = 'none';
+        mobileControlsSplit.style.display = 'flex';
+    } else {
+        mobileControls.style.display = 'flex';
+        mobileControlsSplit.style.display = 'none';
+    }
+}
+
+function setupMobileControls() {
+    // Regular mobile controls (portrait)
     document.getElementById('btn-left').ontouchstart = () => controls.left.left = true;
     document.getElementById('btn-left').ontouchend = () => controls.left.left = false;
     document.getElementById('btn-right').ontouchstart = () => controls.left.right = true;
     document.getElementById('btn-right').ontouchend = () => controls.left.right = false;
+    
     let attackPressTimer = 0;
     let isLongPress = false;
     document.getElementById('btn-attack').ontouchstart = () => {
@@ -600,6 +616,7 @@ if (isMobile) {
         }
         isLongPress = false;
     };
+    
     const btnHeavy = document.getElementById('btn-heavy');
     if (btnHeavy) {
         btnHeavy.ontouchstart = () => {
@@ -609,6 +626,52 @@ if (isMobile) {
             controls.left.strongAttack = false;
         };
     }
+    
+    // Split mobile controls (landscape)
+    document.getElementById('btn-left-split').ontouchstart = () => controls.left.left = true;
+    document.getElementById('btn-left-split').ontouchend = () => controls.left.left = false;
+    document.getElementById('btn-right-split').ontouchstart = () => controls.left.right = true;
+    document.getElementById('btn-right-split').ontouchend = () => controls.left.right = false;
+    
+    let attackPressTimerSplit = 0;
+    let isLongPressSplit = false;
+    document.getElementById('btn-attack-split').ontouchstart = () => {
+        attackPressTimerSplit = setTimeout(() => {
+            isLongPressSplit = true;
+            controls.left.strongAttack = true;
+        }, 500);
+    };
+    document.getElementById('btn-attack-split').ontouchend = () => {
+        clearTimeout(attackPressTimerSplit);
+        if (!isLongPressSplit) {
+            controls.left.basicAttack = true;
+            setTimeout(() => controls.left.basicAttack = false, 100);
+        } else {
+            controls.left.strongAttack = false;
+        }
+        isLongPressSplit = false;
+    };
+    
+    const btnHeavySplit = document.getElementById('btn-heavy-split');
+    if (btnHeavySplit) {
+        btnHeavySplit.ontouchstart = () => {
+            controls.left.strongAttack = true;
+        };
+        btnHeavySplit.ontouchend = () => {
+            controls.left.strongAttack = false;
+        };
+    }
+}
+
+if (isMobile) {
+    setupMobileControls();
+    updateMobileControlsVisibility();
+    
+    // Listen for orientation changes
+    window.addEventListener('orientationchange', () => {
+        setTimeout(updateMobileControlsVisibility, 100);
+    });
+    window.addEventListener('resize', updateMobileControlsVisibility);
     canvas.addEventListener('touchstart', () => {
         if (gameState === 'start') {
             startLevel(currentLevel);
