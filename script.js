@@ -95,8 +95,14 @@ class Player {
         this.characterIndex = characterIndex;
         this.x = x;
         this.y = y;
-        this.width = characterIndex === 1 ? 160 : 120;
-        this.height = 240;
+        // Make characters bigger on mobile
+        if (isMobile) {
+            this.width = characterIndex === 1 ? 200 : 150;
+            this.height = 300;
+        } else {
+            this.width = characterIndex === 1 ? 160 : 120;
+            this.height = 240;
+        }
         this.facing = facing;
         this.controls = controls;
         this.name = name;
@@ -209,12 +215,12 @@ class Player {
         ctx.save();
         ctx.fillStyle = '#fff';
         ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.font = '16px Arial Black';
+        ctx.lineWidth = isMobile ? 3 : 2;
+        ctx.font = isMobile ? '24px Arial Black' : '16px Arial Black';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
         const nameX = this.x + this.width/2;
-        const nameY = this.y - 10;
+        const nameY = this.y - (isMobile ? 15 : 10);
         ctx.strokeText(this.name, nameX, nameY);
         ctx.fillText(this.name, nameX, nameY);
         ctx.restore();
@@ -291,37 +297,42 @@ function drawInscription(level) {
 
 function drawHealthBars() {
     if (players.length < 2) return;
-    const barWidth = 300;
-    const barHeight = 20;
-    const barY = 20;
-    const leftBarX = 20;
-    const rightBarX = canvas.width - barWidth - 20;
+    // Make health bars bigger on mobile
+    const barWidth = isMobile ? 400 : 300;
+    const barHeight = isMobile ? 30 : 20;
+    const barY = isMobile ? 30 : 20;
+    const leftBarX = isMobile ? 30 : 20;
+    const rightBarX = canvas.width - barWidth - (isMobile ? 30 : 20);
+    
+    // Left player health bar
     ctx.fillStyle = '#222';
     ctx.fillRect(leftBarX, barY, barWidth, barHeight);
     ctx.fillStyle = '#e00';
     ctx.fillRect(leftBarX, barY, barWidth * (players[0].hp / players[0].maxHp), barHeight);
     ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = isMobile ? 3 : 2;
     ctx.strokeRect(leftBarX, barY, barWidth, barHeight);
     ctx.fillStyle = '#fff';
-    ctx.font = '18px Arial Black';
+    ctx.font = isMobile ? '24px Arial Black' : '18px Arial Black';
     ctx.textAlign = 'left';
-    ctx.fillText(players[0].name, leftBarX, barY - 5);
-    ctx.font = '14px Arial';
-    ctx.fillText(`${Math.ceil(players[0].hp)}/${players[0].maxHp}`, leftBarX + 5, barY + 15);
+    ctx.fillText(players[0].name, leftBarX, barY - (isMobile ? 8 : 5));
+    ctx.font = isMobile ? '18px Arial' : '14px Arial';
+    ctx.fillText(`${Math.ceil(players[0].hp)}/${players[0].maxHp}`, leftBarX + 5, barY + (isMobile ? 22 : 15));
+    
+    // Right player health bar
     ctx.fillStyle = '#222';
     ctx.fillRect(rightBarX, barY, barWidth, barHeight);
     ctx.fillStyle = '#e00';
     ctx.fillRect(rightBarX, barY, barWidth * (players[1].hp / players[1].maxHp), barHeight);
     ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = isMobile ? 3 : 2;
     ctx.strokeRect(rightBarX, barY, barWidth, barHeight);
     ctx.fillStyle = '#fff';
-    ctx.font = '18px Arial Black';
+    ctx.font = isMobile ? '24px Arial Black' : '18px Arial Black';
     ctx.textAlign = 'right';
-    ctx.fillText(players[1].name, rightBarX + barWidth, barY - 5);
-    ctx.font = '14px Arial';
-    ctx.fillText(`${Math.ceil(players[1].hp)}/${players[1].maxHp}`, rightBarX + barWidth - 5, barY + 15);
+    ctx.fillText(players[1].name, rightBarX + barWidth, barY - (isMobile ? 8 : 5));
+    ctx.font = isMobile ? '18px Arial' : '14px Arial';
+    ctx.fillText(`${Math.ceil(players[1].hp)}/${players[1].maxHp}`, rightBarX + barWidth - 5, barY + (isMobile ? 22 : 15));
 }
 
 function drawGame(level) {
