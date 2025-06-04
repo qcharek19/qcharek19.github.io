@@ -8,12 +8,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-}
-
-@media (max-width: 600px) {
-  #legend {
-    display: none !important;
-  }
+    overflow: hidden;
 }
 
 #game-container {
@@ -43,7 +38,7 @@ body {
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
+    display: none;
     gap: 20px;
     z-index: 10;
 }
@@ -58,6 +53,9 @@ body {
     box-shadow: 0 2px 6px rgba(0,0,0,0.5);
     cursor: pointer;
     transition: background 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
 }
 
 #mobile-controls button:active {
@@ -101,8 +99,36 @@ body {
     background: #666;
 }
 
+#legend {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    text-align: center;
+    font-size: 1.1em;
+    color: #fff;
+    background: rgba(187, 93, 16, 0);
+    border-radius: 8px 8px 0 0;
+    padding: 10px 0 14px 0;
+    max-width: 100vw;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+}
 
-@media (max-width: 950px) {
+/* Desktop and large tablets */
+@media (min-width: 951px) {
+    #game-container {
+        width: 1280px;
+        height: 720px;
+    }
+    #game-canvas {
+        width: 1280px;
+        height: 720px;
+    }
+}
+
+/* Medium tablets */
+@media (max-width: 950px) and (min-width: 601px) {
     #game-container {
         width: 100vw;
         height: 60vw;
@@ -111,38 +137,114 @@ body {
     #game-canvas {
         width: 100vw;
         height: 60vw;
+        max-height: 80vh;
     }
 }
 
-@media (max-width: 600px) {
+/* Mobile devices - Portrait */
+@media (max-width: 600px) and (orientation: portrait) {
+    body {
+        overflow: auto;
+    }
+    
+    #legend {
+        display: none !important;
+    }
+    
     #game-container {
-        height: 60vw;
-        min-height: 300px;
-        margin-bottom: 80px;
+        width: 100vw;
+        height: calc(100vw * 0.5625);
+        max-height: calc(100vh - 120px);
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
+    
     #game-canvas {
-        height: 60vw;
-        min-height: 300px;
+        width: 100vw;
+        height: calc(100vw * 0.5625);
+        max-height: calc(100vh - 120px);
+        border-radius: 0;
+        border: 2px solid #fff;
     }
+    
     #mobile-controls {
         position: fixed;
         left: 0;
         right: 0;
         bottom: 0;
         width: 100vw;
+        height: auto;
         display: flex;
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        gap: 10px;
-        padding: 15px 0 25px 0;
+        gap: 8px;
+        padding: 12px 8px 20px 8px;
         background: rgba(24, 24, 24, 0.98);
-        box-shadow: 0 -2px 12px rgba(0,0,0,0.18);
+        box-shadow: 0 -2px 12px rgba(0,0,0,0.3);
         z-index: 10000;
-        margin-top: 20px;
+        transform: none;
+        margin: 0;
     }
+    
     #mobile-controls button {
-        font-size: 1em;
+        font-size: 0.9em;
+        padding: 12px 8px;
+        min-width: 60px;
+        flex: 1;
+        max-width: 80px;
+    }
+}
+
+/* Mobile devices - Landscape */
+@media (max-width: 950px) and (orientation: landscape) and (max-height: 600px) {
+    body {
+        overflow: hidden;
+    }
+    
+    #legend {
+        display: none !important;
+    }
+    
+    #game-container {
+        width: 100vw;
+        height: calc(100vh - 80px);
+        max-height: calc(100vh - 80px);
+        margin-bottom: 0;
+    }
+    
+    #game-canvas {
+        width: 100vw;
+        height: calc(100vh - 80px);
+        max-height: calc(100vh - 80px);
+        border-radius: 0;
+        border: 1px solid #fff;
+    }
+    
+    #mobile-controls {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 80px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        padding: 10px;
+        background: rgba(24, 24, 24, 0.98);
+        box-shadow: 0 -2px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        transform: none;
+        margin: 0;
+    }
+    
+    #mobile-controls button {
+        font-size: 0.85em;
         padding: 8px 12px;
+        min-width: 70px;
+        height: 50px;
     }
 }
