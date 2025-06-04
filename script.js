@@ -1,4 +1,4 @@
-// Mortal Kombat JS Game - uproszczony system zdrowia i obrażeń
+
 const ASSETS = {
     backgrounds: [
         'assets/background1.png',
@@ -76,17 +76,16 @@ class Player {
         this.heavyAttackCooldown = 0;
         this.comboCount = 0;
         this.comboTimer = 0;
-        this.comboWindow = 60; // 1 second at 60fps
+        this.comboWindow = 60;
     }
     update(opponent) {
-        // Movement (only allowed when fight announcement is not active)
+
         if (!fightAnnouncementActive) {
             if (this.controls.left) this.x -= 3.5;
             if (this.controls.right) this.x += 3.5;
             this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
         }
         
-        // Update combo timer
         if (this.comboTimer > 0) {
             this.comboTimer--;
             if (this.comboTimer === 0) {
@@ -94,7 +93,6 @@ class Player {
             }
         }
         
-        // Basic Attack (25% damage) - only allowed when fight announcement is not active
         if (!fightAnnouncementActive && this.controls.basicAttack && this.attackCooldown === 0) {
             this.isAttacking = true;
             if (rectsOverlap(this.getRect(), opponent.getRect())) {
@@ -102,37 +100,34 @@ class Player {
                 this.comboTimer = this.comboWindow;
                 
                 if (this.comboCount >= 3) {
-                    // Combo attack (75% damage)
                     opponent.takeDamage(Math.floor(opponent.maxHp * 0.75));
                     this.comboCount = 0;
                     this.comboTimer = 0;
                 } else {
-                    // Basic attack (25% damage)
                     opponent.takeDamage(Math.floor(opponent.maxHp * 0.25));
                 }
             }
-            this.attackCooldown = 30; // 0.5 seconds
+            this.attackCooldown = 30;
         }
         
-        // Strong Attack (50% damage) - can only be used once every 2 seconds
+
         if (!fightAnnouncementActive && this.controls.strongAttack && this.attackCooldown === 0 && this.heavyAttackCooldown === 0) {
             this.isAttacking = true;
             if (rectsOverlap(this.getRect(), opponent.getRect())) {
                 opponent.takeDamage(Math.floor(opponent.maxHp * 0.50));
             }
-            this.attackCooldown = 45; // 0.75 seconds (longer cooldown for strong attack)
-            this.heavyAttackCooldown = 120; // 2 seconds at 60fps
-            this.comboCount = 0; // Reset combo on strong attack
+            this.attackCooldown = 45;
+            this.heavyAttackCooldown = 120;
+            this.comboCount = 0;
             this.comboTimer = 0;
         }
         
-        // Update attack cooldowns
+
         if (this.attackCooldown > 0) {
             this.attackCooldown--;
             if (this.attackCooldown === 0) this.isAttacking = false;
         }
         
-        // Update heavy attack cooldown
         if (this.heavyAttackCooldown > 0) {
             this.heavyAttackCooldown--;
         }
@@ -153,7 +148,7 @@ class Player {
             ctx.drawImage(this.img, -this.width/2, -this.height/2, this.width, this.height);
         }
         ctx.restore();
-        // Pasek HP
+
         ctx.fillStyle = '#222';
         ctx.fillRect(this.x, this.y - 20, this.width, 10);
         ctx.fillStyle = '#e00';
@@ -199,7 +194,7 @@ function randomFromPool(pool) {
 function startLevel(level) {
     let leftIdx = randomFromPool(leftPool);
     let rightIdx = randomFromPool(rightPool);
-    // Place players further apart and vertically centered for 1280x720
+
     players = [
         new Player(characterImgs[leftIdx], 180, 720 - 240 - 40, 1, controls.left, playerNames[0]),
         new Player(characterImgs[rightIdx], 1280 - 180 - 120, 720 - 240 - 40, -1, controls.right, playerNames[1]),
@@ -245,21 +240,20 @@ function drawGame(level) {
     ctx.textAlign = 'right';
     ctx.fillText(`${playerNames[1]}: ${roundsWon[1]}`, canvas.width - 20, 40);
     
-    // Draw fight announcement if active
     if (fightAnnouncementActive) {
         drawFightAnnouncement();
     }
 }
 
 function drawFightAnnouncement() {
-    // Semi-transparent overlay
+
     ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Big "FIGHT!" text
+
     ctx.save();
-    ctx.fillStyle = '#FFD700'; // Gold color
-    ctx.strokeStyle = '#FF0000'; // Red outline
+    ctx.fillStyle = '#FFD700';
+    ctx.strokeStyle = '#FF0000';
     ctx.lineWidth = 8;
     ctx.font = 'bold 120px Arial Black';
     ctx.textAlign = 'center';
@@ -269,7 +263,6 @@ function drawFightAnnouncement() {
     const x = canvas.width / 2;
     const y = canvas.height / 2;
     
-    // Draw text with outline
     ctx.strokeText(text, x, y);
     ctx.fillText(text, x, y);
     
@@ -281,16 +274,13 @@ function updateGame() {
         let cpu = players[1];
         let player = players[0];
         
-        // CPU can only move and attack when fight announcement is not active
         if (!fightAnnouncementActive) {
             cpu.controls.left = cpu.x > player.x + 100;
             cpu.controls.right = cpu.x < player.x - 100;
             
-            // CPU attack logic
             let distance = Math.abs(cpu.x - player.x);
             if (distance < 120 && cpu.attackCooldown === 0) {
-                // Randomly choose between basic and strong attack
-                // CPU can only use strong attack if heavy attack cooldown is ready
+
                 if (Math.random() < 0.7 || cpu.heavyAttackCooldown > 0) {
                     cpu.controls.basicAttack = true;
                 } else {
@@ -301,7 +291,6 @@ function updateGame() {
                 cpu.controls.strongAttack = false;
             }
         } else {
-            // Stop all CPU actions during fight announcement
             cpu.controls.left = false;
             cpu.controls.right = false;
             cpu.controls.basicAttack = false;
@@ -433,10 +422,10 @@ function startGame() {
 }
 
 function playFightSequence() {
-    // Activate fight announcement (prevents movement and attacks)
+
     fightAnnouncementActive = true;
     
-    // Play fight sound first
+
     if (fightSound) {
         fightSound.currentTime = 0;
         fightSound.play();
