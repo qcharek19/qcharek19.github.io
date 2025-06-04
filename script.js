@@ -148,17 +148,6 @@ class Player {
             ctx.drawImage(this.img, -this.width/2, -this.height/2, this.width, this.height);
         }
         ctx.restore();
-
-        ctx.fillStyle = '#222';
-        ctx.fillRect(this.x, this.y - 20, this.width, 10);
-        ctx.fillStyle = '#e00';
-        ctx.fillRect(this.x, this.y - 20, this.width * (this.hp/this.maxHp), 10);
-        ctx.strokeStyle = '#fff';
-        ctx.strokeRect(this.x, this.y - 20, this.width, 10);
-        ctx.fillStyle = '#fff';
-        ctx.font = '16px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(this.name, this.x + this.width/2, this.y - 30);
     }
 }
 
@@ -228,17 +217,66 @@ function drawInscription(level) {
     }
 }
 
+function drawHealthBars() {
+    if (players.length < 2) return;
+    
+    const barWidth = 300;
+    const barHeight = 20;
+    const barY = 20;
+    const leftBarX = 20;
+    const rightBarX = canvas.width - barWidth - 20;
+    
+    // Player 1 (Left) Health Bar
+    ctx.fillStyle = '#222';
+    ctx.fillRect(leftBarX, barY, barWidth, barHeight);
+    ctx.fillStyle = '#e00';
+    ctx.fillRect(leftBarX, barY, barWidth * (players[0].hp / players[0].maxHp), barHeight);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(leftBarX, barY, barWidth, barHeight);
+    
+    // Player 1 Name and HP
+    ctx.fillStyle = '#fff';
+    ctx.font = '18px Arial Black';
+    ctx.textAlign = 'left';
+    ctx.fillText(players[0].name, leftBarX, barY - 5);
+    ctx.font = '14px Arial';
+    ctx.fillText(`${Math.ceil(players[0].hp)}/${players[0].maxHp}`, leftBarX + 5, barY + 15);
+    
+    // Player 2 (Right) Health Bar
+    ctx.fillStyle = '#222';
+    ctx.fillRect(rightBarX, barY, barWidth, barHeight);
+    ctx.fillStyle = '#e00';
+    ctx.fillRect(rightBarX, barY, barWidth * (players[1].hp / players[1].maxHp), barHeight);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(rightBarX, barY, barWidth, barHeight);
+    
+    // Player 2 Name and HP
+    ctx.fillStyle = '#fff';
+    ctx.font = '18px Arial Black';
+    ctx.textAlign = 'right';
+    ctx.fillText(players[1].name, rightBarX + barWidth, barY - 5);
+    ctx.font = '14px Arial';
+    ctx.fillText(`${Math.ceil(players[1].hp)}/${players[1].maxHp}`, rightBarX + barWidth - 5, barY + 15);
+}
+
 function drawGame(level) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const bgIdx = level % backgrounds.length;
     ctx.drawImage(backgrounds[bgIdx], 0, 0, canvas.width, canvas.height);
     players.forEach(p => p.draw());
+    
+    // Draw health bars at the top
+    drawHealthBars();
+    
+    // Draw round scores
     ctx.fillStyle = '#fff';
     ctx.font = '28px Arial Black';
     ctx.textAlign = 'left';
-    ctx.fillText(`${playerNames[0]}: ${roundsWon[0]}`, 20, 40);
+    ctx.fillText(`${playerNames[0]}: ${roundsWon[0]}`, 20, 80);
     ctx.textAlign = 'right';
-    ctx.fillText(`${playerNames[1]}: ${roundsWon[1]}`, canvas.width - 20, 40);
+    ctx.fillText(`${playerNames[1]}: ${roundsWon[1]}`, canvas.width - 20, 80);
     
     if (fightAnnouncementActive) {
         drawFightAnnouncement();
