@@ -122,11 +122,11 @@ class Player {
 
         if (!fightAnnouncementActive) {
             if (this.controls.left) {
-                this.x -= 3.5;
+                this.x -= 3;
                 this.isMoving = true;
             }
             if (this.controls.right) {
-                this.x += 3.5;
+                this.x += 3;
                 this.isMoving = true;
             }
             this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
