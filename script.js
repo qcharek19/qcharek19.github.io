@@ -95,7 +95,6 @@ class Player {
         this.characterIndex = characterIndex;
         this.x = x;
         this.y = y;
-        // Make character 2 (index 1) wider than others
         this.width = characterIndex === 1 ? 160 : 120;
         this.height = 240;
         this.facing = facing;
@@ -113,7 +112,6 @@ class Player {
         this.isMoving = false;
     }
     update(opponent) {
-        // Reset movement state
         this.isMoving = false;
 
         if (!fightAnnouncementActive) {
@@ -186,7 +184,6 @@ class Player {
         return { x: this.x, y: this.y, w: this.width, h: this.height };
     }
     draw() {
-        // Determine which image to use based on current state
         let currentImg;
         if (this.isAttacking && this.isHeavyAttacking) {
             currentImg = characterImgs.heavyAttack[this.characterIndex];
@@ -220,13 +217,10 @@ function loadImage(src) {
 
 async function loadAssets() {
     backgrounds = await Promise.all(ASSETS.backgrounds.map(loadImage));
-    
-    // Load all character animation states
     characterImgs.idle = await Promise.all(ASSETS.characters.idle.map(loadImage));
     characterImgs.walk = await Promise.all(ASSETS.characters.walk.map(loadImage));
     characterImgs.attack = await Promise.all(ASSETS.characters.attack.map(loadImage));
     characterImgs.heavyAttack = await Promise.all(ASSETS.characters.heavyAttack.map(loadImage));
-    
     startScreenImg = await loadImage(ASSETS.startScreen);
     theme2Img = await loadImage(ASSETS.theme2);
     winRoundSound = new Audio(ASSETS.winRound);
@@ -248,7 +242,6 @@ function randomFromPool(pool) {
 function startLevel(level) {
     let leftIdx = randomFromPool(leftPool);
     let rightIdx = randomFromPool(rightPool);
-
     players = [
         new Player(leftIdx, 180, 720 - 240 - 40, 1, controls.left, playerNames[0]),
         new Player(rightIdx, 1280 - 180 - 120, 720 - 240 - 40, -1, controls.right, playerNames[1]),
@@ -284,14 +277,11 @@ function drawInscription(level) {
 
 function drawHealthBars() {
     if (players.length < 2) return;
-    
     const barWidth = 300;
     const barHeight = 20;
     const barY = 20;
     const leftBarX = 20;
     const rightBarX = canvas.width - barWidth - 20;
-    
-    // Player 1 (Left) Health Bar
     ctx.fillStyle = '#222';
     ctx.fillRect(leftBarX, barY, barWidth, barHeight);
     ctx.fillStyle = '#e00';
@@ -299,16 +289,12 @@ function drawHealthBars() {
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 2;
     ctx.strokeRect(leftBarX, barY, barWidth, barHeight);
-    
-    // Player 1 Name and HP
     ctx.fillStyle = '#fff';
     ctx.font = '18px Arial Black';
     ctx.textAlign = 'left';
     ctx.fillText(players[0].name, leftBarX, barY - 5);
     ctx.font = '14px Arial';
     ctx.fillText(`${Math.ceil(players[0].hp)}/${players[0].maxHp}`, leftBarX + 5, barY + 15);
-    
-    // Player 2 (Right) Health Bar
     ctx.fillStyle = '#222';
     ctx.fillRect(rightBarX, barY, barWidth, barHeight);
     ctx.fillStyle = '#e00';
@@ -316,8 +302,6 @@ function drawHealthBars() {
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 2;
     ctx.strokeRect(rightBarX, barY, barWidth, barHeight);
-    
-    // Player 2 Name and HP
     ctx.fillStyle = '#fff';
     ctx.font = '18px Arial Black';
     ctx.textAlign = 'right';
@@ -331,29 +315,21 @@ function drawGame(level) {
     const bgIdx = level % backgrounds.length;
     ctx.drawImage(backgrounds[bgIdx], 0, 0, canvas.width, canvas.height);
     players.forEach(p => p.draw());
-    
-    // Draw health bars at the top
     drawHealthBars();
-    
-    // Draw round scores
     ctx.fillStyle = '#fff';
     ctx.font = '28px Arial Black';
     ctx.textAlign = 'left';
     ctx.fillText(`${playerNames[0]}: ${roundsWon[0]}`, 20, 80);
     ctx.textAlign = 'right';
     ctx.fillText(`${playerNames[1]}: ${roundsWon[1]}`, canvas.width - 20, 80);
-    
     if (fightAnnouncementActive) {
         drawFightAnnouncement();
     }
 }
 
 function drawFightAnnouncement() {
-
     ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-
     ctx.save();
     ctx.fillStyle = '#FFD700';
     ctx.strokeStyle = '#FF0000';
@@ -361,14 +337,11 @@ function drawFightAnnouncement() {
     ctx.font = 'bold 120px Arial Black';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    
     const text = 'FIGHT!';
     const x = canvas.width / 2;
     const y = canvas.height / 2;
-    
     ctx.strokeText(text, x, y);
     ctx.fillText(text, x, y);
-    
     ctx.restore();
 }
 
@@ -376,14 +349,11 @@ function updateGame() {
     if (isMobile) {
         let cpu = players[1];
         let player = players[0];
-        
         if (!fightAnnouncementActive) {
             cpu.controls.left = cpu.x > player.x + 100;
             cpu.controls.right = cpu.x < player.x - 100;
-            
             let distance = Math.abs(cpu.x - player.x);
             if (distance < 120 && cpu.attackCooldown === 0) {
-
                 if (Math.random() < 0.7 || cpu.heavyAttackCooldown > 0) {
                     cpu.controls.basicAttack = true;
                 } else {
@@ -525,33 +495,25 @@ function startGame() {
 }
 
 function playFightSequence() {
-
     fightAnnouncementActive = true;
-    
-
     if (fightSound) {
         fightSound.currentTime = 0;
         fightSound.play();
-        
-        // Play background music after fight sound ends and allow movement
         fightSound.onended = () => {
-            fightAnnouncementActive = false; // Allow movement and attacks
+            fightAnnouncementActive = false;
             bgMusic.currentTime = 0;
             bgMusic.play();
         };
     } else {
-        // Fallback if fight sound isn't loaded
         fightAnnouncementActive = false;
         bgMusic.currentTime = 0;
         bgMusic.play();
     }
 }
 
-// Keyboard controls
 window.addEventListener('keydown', (e) => {
     const overlay = document.getElementById('name-overlay');
     const overlayVisible = overlay && overlay.style.display !== 'none';
-    // Prevent game start if overlay is visible and Enter is pressed
     if (gameState === 'start' && (e.key === 'Enter' || e.key === ' ')) {
         if (overlayVisible) return;
         if (roundsWon[0] < roundsToWin && roundsWon[1] < roundsToWin) {
@@ -565,8 +527,6 @@ window.addEventListener('keydown', (e) => {
     if (gameState === 'gameover' && (e.key === 'Enter' || e.key === ' ')) {
         startGame();
     }
-    // Player 1: A/D movement, W basic attack, S strong attack
-    // Player 2: Arrow keys movement, Up basic attack, Down strong attack
     if (!isMobile) {
         if (e.key === 'a' || e.key === 'A') controls.left.left = true;
         if (e.key === 'd' || e.key === 'D') controls.left.right = true;
@@ -591,25 +551,20 @@ window.addEventListener('keyup', (e) => {
     }
 });
 
-// Mobile controls
 if (isMobile) {
     mobileControls.style.display = 'flex';
     document.getElementById('btn-left').ontouchstart = () => controls.left.left = true;
     document.getElementById('btn-left').ontouchend = () => controls.left.left = false;
     document.getElementById('btn-right').ontouchstart = () => controls.left.right = true;
     document.getElementById('btn-right').ontouchend = () => controls.left.right = false;
-    
-    // Mobile attack button acts as basic attack (tap) or strong attack (long press)
     let attackPressTimer = 0;
     let isLongPress = false;
-    
     document.getElementById('btn-attack').ontouchstart = () => {
         attackPressTimer = setTimeout(() => {
             isLongPress = true;
             controls.left.strongAttack = true;
-        }, 500); // 500ms for long press
+        }, 500);
     };
-    
     document.getElementById('btn-attack').ontouchend = () => {
         clearTimeout(attackPressTimer);
         if (!isLongPress) {
@@ -620,8 +575,6 @@ if (isMobile) {
         }
         isLongPress = false;
     };
-
-    // Heavy Attack button (always triggers strong attack)
     const btnHeavy = document.getElementById('btn-heavy');
     if (btnHeavy) {
         btnHeavy.ontouchstart = () => {
@@ -631,7 +584,6 @@ if (isMobile) {
             controls.left.strongAttack = false;
         };
     }
-    
     canvas.addEventListener('touchstart', () => {
         if (gameState === 'start') {
             startLevel(currentLevel);
