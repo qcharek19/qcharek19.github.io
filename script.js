@@ -204,6 +204,20 @@ class Player {
             ctx.drawImage(currentImg, -this.width/2, -this.height/2, this.width, this.height);
         }
         ctx.restore();
+        
+        // Draw player name above character
+        ctx.save();
+        ctx.fillStyle = '#fff';
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.font = '16px Arial Black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        const nameX = this.x + this.width/2;
+        const nameY = this.y - 10;
+        ctx.strokeText(this.name, nameX, nameY);
+        ctx.fillText(this.name, nameX, nameY);
+        ctx.restore();
     }
 }
 
