@@ -118,6 +118,7 @@ body {
     #game-container {
         height: 60vw;
         min-height: 300px;
+        margin-bottom: 80px;
     }
     #game-canvas {
         height: 60vw;
@@ -134,11 +135,11 @@ body {
         justify-content: center;
         align-items: center;
         gap: 10px;
-        padding: 10px 0 18px 0;
+        padding: 15px 0 25px 0;
         background: rgba(24, 24, 24, 0.98);
         box-shadow: 0 -2px 12px rgba(0,0,0,0.18);
         z-index: 10000;
-        margin-top: 0;
+        margin-top: 20px;
     }
     #mobile-controls button {
         font-size: 1em;
