@@ -12,14 +12,40 @@ const ASSETS = {
         'assets/level2.png',
         'assets/level3.png',
     ],
-    characters: [
-        'assets/character1.png',
-        'assets/character2.png',
-        'assets/character3.png',
-        'assets/character4.png',
-        'assets/character5.png',
-        'assets/character6.png',
-    ],
+    characters: {
+        idle: [
+            'assets/character1.png',
+            'assets/character2.png',
+            'assets/character3.png',
+            'assets/character4.png',
+            'assets/character5.png',
+            'assets/character6.png',
+        ],
+        walk: [
+            'assets/character1w.png',
+            'assets/character2w.png',
+            'assets/character3w.png',
+            'assets/character4w.png',
+            'assets/character5w.png',
+            'assets/character6w.png',
+        ],
+        attack: [
+            'assets/character1p.png',
+            'assets/character2p.png',
+            'assets/character3p.png',
+            'assets/character4p.png',
+            'assets/character5p.png',
+            'assets/character6p.png',
+        ],
+        heavyAttack: [
+            'assets/character1k.png',
+            'assets/character2k.png',
+            'assets/character3k.png',
+            'assets/character4k.png',
+            'assets/character5k.png',
+            'assets/character6k.png',
+        ]
+    },
     theme: 'assets/theme.mp3',
     win: 'assets/win.mp3',
     winRound: 'assets/win1.mp3',
@@ -49,7 +75,12 @@ const rightPool = [0, 2, 4];
 let playerNames = ["Player 1", "Player 2"];
 let players = [];
 let backgrounds = [];
-let characterImgs = [];
+let characterImgs = {
+    idle: [],
+    walk: [],
+    attack: [],
+    heavyAttack: []
+};
 let startScreenImg = null;
 let theme2Img = null;
 let levelInscriptions = [];
@@ -60,8 +91,8 @@ const controls = {
 };
 
 class Player {
-    constructor(img, x, y, facing, controls, name) {
-        this.img = img;
+    constructor(characterIndex, x, y, facing, controls, name) {
+        this.characterIndex = characterIndex;
         this.x = x;
         this.y = y;
         this.width = 120;
@@ -72,17 +103,27 @@ class Player {
         this.maxHp = 100;
         this.hp = 100;
         this.isAttacking = false;
+        this.isHeavyAttacking = false;
         this.attackCooldown = 0;
         this.heavyAttackCooldown = 0;
         this.comboCount = 0;
         this.comboTimer = 0;
         this.comboWindow = 60;
+        this.isMoving = false;
     }
     update(opponent) {
+        // Reset movement state
+        this.isMoving = false;
 
         if (!fightAnnouncementActive) {
-            if (this.controls.left) this.x -= 3.5;
-            if (this.controls.right) this.x += 3.5;
+            if (this.controls.left) {
+                this.x -= 3.5;
+                this.isMoving = true;
+            }
+            if (this.controls.right) {
+                this.x += 3.5;
+                this.isMoving = true;
+            }
             this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
         }
         
@@ -95,6 +136,7 @@ class Player {
         
         if (!fightAnnouncementActive && this.controls.basicAttack && this.attackCooldown === 0) {
             this.isAttacking = true;
+            this.isHeavyAttacking = false;
             if (rectsOverlap(this.getRect(), opponent.getRect())) {
                 this.comboCount++;
                 this.comboTimer = this.comboWindow;
@@ -113,6 +155,7 @@ class Player {
 
         if (!fightAnnouncementActive && this.controls.strongAttack && this.attackCooldown === 0 && this.heavyAttackCooldown === 0) {
             this.isAttacking = true;
+            this.isHeavyAttacking = true;
             if (rectsOverlap(this.getRect(), opponent.getRect())) {
                 opponent.takeDamage(Math.floor(opponent.maxHp * 0.50));
             }
@@ -125,7 +168,10 @@ class Player {
 
         if (this.attackCooldown > 0) {
             this.attackCooldown--;
-            if (this.attackCooldown === 0) this.isAttacking = false;
+            if (this.attackCooldown === 0) {
+                this.isAttacking = false;
+                this.isHeavyAttacking = false;
+            }
         }
         
         if (this.heavyAttackCooldown > 0) {
@@ -139,13 +185,25 @@ class Player {
         return { x: this.x, y: this.y, w: this.width, h: this.height };
     }
     draw() {
+        // Determine which image to use based on current state
+        let currentImg;
+        if (this.isAttacking && this.isHeavyAttacking) {
+            currentImg = characterImgs.heavyAttack[this.characterIndex];
+        } else if (this.isAttacking) {
+            currentImg = characterImgs.attack[this.characterIndex];
+        } else if (this.isMoving) {
+            currentImg = characterImgs.walk[this.characterIndex];
+        } else {
+            currentImg = characterImgs.idle[this.characterIndex];
+        }
+
         ctx.save();
         ctx.translate(this.x + this.width/2, this.y + this.height/2);
         if (this.facing === 1) {
-            ctx.drawImage(this.img, -this.width/2, -this.height/2, this.width, this.height);
+            ctx.drawImage(currentImg, -this.width/2, -this.height/2, this.width, this.height);
         } else {
             ctx.scale(-1, 1);
-            ctx.drawImage(this.img, -this.width/2, -this.height/2, this.width, this.height);
+            ctx.drawImage(currentImg, -this.width/2, -this.height/2, this.width, this.height);
         }
         ctx.restore();
     }
@@ -161,7 +219,13 @@ function loadImage(src) {
 
 async function loadAssets() {
     backgrounds = await Promise.all(ASSETS.backgrounds.map(loadImage));
-    characterImgs = await Promise.all(ASSETS.characters.map(loadImage));
+    
+    // Load all character animation states
+    characterImgs.idle = await Promise.all(ASSETS.characters.idle.map(loadImage));
+    characterImgs.walk = await Promise.all(ASSETS.characters.walk.map(loadImage));
+    characterImgs.attack = await Promise.all(ASSETS.characters.attack.map(loadImage));
+    characterImgs.heavyAttack = await Promise.all(ASSETS.characters.heavyAttack.map(loadImage));
+    
     startScreenImg = await loadImage(ASSETS.startScreen);
     theme2Img = await loadImage(ASSETS.theme2);
     winRoundSound = new Audio(ASSETS.winRound);
@@ -185,8 +249,8 @@ function startLevel(level) {
     let rightIdx = randomFromPool(rightPool);
 
     players = [
-        new Player(characterImgs[leftIdx], 180, 720 - 240 - 40, 1, controls.left, playerNames[0]),
-        new Player(characterImgs[rightIdx], 1280 - 180 - 120, 720 - 240 - 40, -1, controls.right, playerNames[1]),
+        new Player(leftIdx, 180, 720 - 240 - 40, 1, controls.left, playerNames[0]),
+        new Player(rightIdx, 1280 - 180 - 120, 720 - 240 - 40, -1, controls.right, playerNames[1]),
     ];
     players[0].hp = players[0].maxHp;
     players[1].hp = players[1].maxHp;
@@ -394,7 +458,7 @@ function drawGameOver() {
     }
     if (matchWinner) {
         let winnerIdx = matchWinner === playerNames[0] ? 0 : 1;
-        let winnerImg = players[winnerIdx].img;
+        let winnerImg = characterImgs.idle[players[winnerIdx].characterIndex];
         let srcX = 0;
         let srcY = 0;
         let srcW = winnerImg.width;
