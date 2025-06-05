@@ -123,11 +123,11 @@ class Player {
 
         if (!fightAnnouncementActive) {
             if (this.controls.left) {
-                this.x -= 3;
+                this.x -= 3.3;
                 this.isMoving = true;
             }
             if (this.controls.right) {
-                this.x += 3;
+                this.x += 3.3;
                 this.isMoving = true;
             }
             this.x = Math.max(0, Math.min(canvas.width - this.width, this.x));
@@ -152,10 +152,10 @@ class Player {
                     this.comboCount = 0;
                     this.comboTimer = 0;
                 } else {
-                    opponent.takeDamage(Math.floor(opponent.maxHp * 0.25));
+                    opponent.takeDamage(Math.floor(opponent.maxHp * 0.10));
                 }
             }
-            this.attackCooldown = 30;
+            this.attackCooldown = 60;
         }
         
 
@@ -163,7 +163,7 @@ class Player {
             this.isAttacking = true;
             this.isHeavyAttacking = true;
             if (rectsOverlap(this.getRect(), opponent.getRect())) {
-                opponent.takeDamage(Math.floor(opponent.maxHp * 0.50));
+                opponent.takeDamage(Math.floor(opponent.maxHp * 0.25));
             }
             this.attackCooldown = 45;
             this.heavyAttackCooldown = 120;
