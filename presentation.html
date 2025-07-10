@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacman Presentation</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+            margin: 20px;
+            background-color: black;
+            color: white;
+        }
+        h1 {
+            color: #007BFF;
+            font-size: 36px;
+        }
+        p {
+            font-size: 20px;
+        }
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .image-container img {
+            width: 150px;
+            margin: 0 10px;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+        .audio-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .audio-container a {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #1b2838;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .audio-container a:hover {
+            background-color: #0a1a2b;
+            transform: scale(1.1);
+        }
+        .legendary-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #FFD700;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+        }
+        .legendary-button:hover {
+            background-color: #FFC107;
+            transform: scale(1.1);
+        }
+        .gif-container {
+            position: absolute;
+            bottom: 20px;
+            left: 47%;
+            transform: translateX(-50%);
+        }
+        .gif-container img {
+            width: 500px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pacman Presentation</h1>
+    <div class="image-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Pacman_HD.png" alt="Pacman">
+        <img src="https://www.giantbomb.com/a/uploads/scale_small/8/87790/2469740-blinky.png" alt="Red Ghost">
+        <img src="https://www.giantbomb.com/a/uploads/square_medium/8/87790/2469744-pinky.png" alt="Pink Ghost">
+        <img src="https://www.giantbomb.com/a/uploads/scale_small/8/87790/2469741-inky.png" alt="Cyan Ghost">
+        <img src="https://www.giantbomb.com/a/uploads/scale_small/8/87790/2469743-orange.png" alt="Orange Ghost">
+    </div>
+    <p>Pacman is a classic arcade game developed by Namco and first released in 1980. The player controls Pacman, who must eat all the dots inside an enclosed maze while avoiding four colored ghosts. Eating large flashing dots called "Power Pellets" causes the ghosts to turn blue, allowing Pacman to eat them for bonus points.</p>
+    <p>The game was a massive success and became a cultural icon of the 1980s. It has spawned numerous sequels, merchandise, and even an animated TV series. Pacman is widely regarded as one of the greatest video games of all time and has had a lasting impact on the gaming industry.</p>
+    <button onclick="window.location.href='index.html'">Return to Home Page</button>
+    <div class="audio-container">
+        <p>Stairway to Heaven - Led Zeppelin</p>
+        <audio id="backgroundMusic" src="/media/stairway.mp3" autoplay loop controls></audio>
+        <a href="https://www.youtube.com/watch?v=QkF3oxziUI4" target="_blank">Listen on YouTube</a>
+    </div>
+    <button class="legendary-button" onclick="moveToLegendaryMoment()">Legendary Song Moment</button>
+    <div class="gif-container">
+        <img src="https://media.tenor.com/jhsMAREYalUAAAAM/pacman-gaming.gif" alt="Pacman Eating">
+    </div>
+    <script>
+        function moveToLegendaryMoment() {
+            const audio = document.getElementById('backgroundMusic');
+            audio.currentTime = 6 * 60 + 40;
+            audio.play();
+        }
+    </script>
+</body>
+</html>

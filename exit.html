@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goodbye</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h1 {
+            font-size: 48px;
+            animation: colorChange 3s infinite;
+        }
+        p {
+            font-size: 24px;
+            color: #00FFFF; 
+        }
+        @keyframes colorChange {
+            0% { color: #FF69B4; }
+            25% { color: #00FFFF; }
+            50% { color: #FFD700; }
+            75% { color: #ADFF2F; }
+            100% { color: #FF69B4; }
+        }
+        .player {
+            position: absolute;
+            bottom: 80px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            color: white;
+            flex-direction: column;
+        }
+        .player button {
+            background-color: #00FFFF;
+            border: none;
+            color: black;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .player span {
+            margin: 5px;
+        }
+        .player input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .time-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Thanks for visiting:)</h1>
+        <p>Have a nice day!!</p>
+    </div>
+    <div class="player">
+        <p>Walk of Life - Dire Straits</p>
+        <button id="playPauseBtn">Pause</button>
+        <div class="time-container">
+            <span id="currentTime">0:00</span>
+            <input type="range" id="songSlider" min="0" max="100" value="0">
+            <span id="timeRemaining">0:00</span>
+        </div>
+        <a href="https://www.youtube.com/watch?v=kd9TlGDZGkI" target="_blank" style="margin-left: 10px; color: #00FFFF;">Listen on YouTube</a>
+    </div>
+    <audio id="backgroundMusic" src="/media/Walk_Of_Life.mp3" autoplay loop></audio>
+    <script>
+        const audio = document.getElementById('backgroundMusic');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const currentTime = document.getElementById('currentTime');
+        const timeRemaining = document.getElementById('timeRemaining');
+        const songSlider = document.getElementById('songSlider');
+
+        playPauseBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.textContent = 'Pause';
+            } else {
+                audio.pause();
+                playPauseBtn.textContent = 'Play';
+            }
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            const elapsed = audio.currentTime;
+            const remaining = audio.duration - audio.currentTime;
+            const elapsedMinutes = Math.floor(elapsed / 60);
+            const elapsedSeconds = Math.floor(elapsed % 60).toString().padStart(2, '0');
+            const remainingMinutes = Math.floor(remaining / 60);
+            const remainingSeconds = Math.floor(remaining % 60).toString().padStart(2, '0');
+            currentTime.textContent = `${elapsedMinutes}:${elapsedSeconds}`;
+            timeRemaining.textContent = `${remainingMinutes}:${remainingSeconds}`;
+            songSlider.value = (audio.currentTime / audio.duration) * 100;
+        });
+
+        songSlider.addEventListener('input', () => {
+            audio.currentTime = (songSlider.value / 100) * audio.duration;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Menu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black;
+            color: white;
+            position: relative;
+        }
+        .menu {
+            text-align: center;
+        }
+        .menu a, .menu button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.3s;
+            cursor: pointer;
+        }
+        .menu a:hover, .menu button:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        #randomText {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        .steam-button, .youtube-button {
+            padding: 10px 20px;
+            background-color: #1b2838;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .steam-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .steam-button:hover, .youtube-button:hover {
+            background-color: #0a1a2b;
+            transform: scale(1.1);
+        }
+        .exit-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #FF0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .exit-button:hover {
+            background-color: #cc0000;
+            transform: scale(1.1);
+        }
+        .audio-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .audio-container a, .audio-container button {
+            margin-top: 10px;
+        }
+        .bangers-button {
+            position: absolute;
+            bottom: 20px;
+            left: 42%;
+            padding: 20px 40px;
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .bangers-button:hover {
+            background-color: #ff1493;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <h1>Welcome to the qcharek's Website</h1>
+        <a href="pacman.html">Play Pacman Game</a>
+        <a href="presentation.html">View Pacman Presentation</a>
+        <button onclick="showRandomText()">Make My Day</button>
+        <p id="randomText"></p>
+    </div>
+    <a href="https://steamcommunity.com/profiles/76561199146110844/" class="steam-button" target="_blank">My Steam Profile</a>
+    <a href="exit.html" class="exit-button">Exit</a>
+    <div class="audio-container">
+        <p>Sultans of Swing - Dire Straits</p>
+        <audio id="backgroundMusic" src="/media/Sutltans_of_Swing.mp3" autoplay loop controls></audio>
+        <a href="https://www.youtube.com/watch?v=h0ffIJ7ZO4U" class="youtube-button" target="_blank">Listen on YouTube</a>
+    </div>
+    <button onclick="window.location.href='bangers.html'" class="bangers-button">More Bangers Like This;)</button>
+    <script>
+        function showRandomText() {
+            const messages = [
+                "You are awesome!",
+                "Have a fantastic day!",
+                "Keep smiling!",
+                "You can achieve anything!",
+                "Believe in yourself!",
+                "You are a star!",
+                "You are a legend!",
+                "Today is your day! May everything go your way.",
+                "You are amazing! Never forget the positive impact you have on others.",
+                "Whatever you do today, may it bring you joy and fulfillment.",
+                "Never doubt your worth. The world is better because you're in it.",
+                "Every day is a new chance – smile and make the most of it.",
+                "You have the strength to overcome any challenge.",
+                "You deserve the best – don’t be afraid to go after it.",
+                "Today is the perfect day to do something for yourself.",
+                "Your dreams are within reach – go after them.",
+                "Even the smallest kindness can brighten someone’s day, including yours."
+            ];
+            const colors = ["red", "green", "blue", "orange", "purple"];
+            const randomIndex = Math.floor(Math.random() * messages.length);
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomTextElement = document.getElementById('randomText');
+            randomTextElement.textContent = messages[randomIndex];
+            randomTextElement.style.color = randomColor;
+        }
+
+        const audio = document.getElementById('backgroundMusic');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const currentTime = document.getElementById('currentTime');
+        const timeRemaining = document.getElementById('timeRemaining');
+        const songSlider = document.getElementById('songSlider');
+
+        playPauseBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.textContent = 'Pause';
+            } else {
+                audio.pause();
+                playPauseBtn.textContent = 'Play';
+            }
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            const elapsed = audio.currentTime;
+            const remaining = audio.duration - audio.currentTime;
+            const elapsedMinutes = Math.floor(elapsed / 60);
+            const elapsedSeconds = Math.floor(elapsed % 60).toString().padStart(2, '0');
+            const remainingMinutes = Math.floor(remaining / 60);
+            const remainingSeconds = Math.floor(remaining % 60).toString().padStart(2, '0');
+            currentTime.textContent = `${elapsedMinutes}:${elapsedSeconds}`;
+            timeRemaining.textContent = `${remainingMinutes}:${remainingSeconds}`;
+            songSlider.value = (audio.currentTime / audio.duration) * 100;
+        });
+
+        songSlider.addEventListener('input', () => {
+            audio.currentTime = (songSlider.value / 100) * audio.duration;
+        });
+    </script>
+</body>
+</html>

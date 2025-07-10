@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacman Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black;
+        }
+        canvas {
+            border: 1px solid white;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+        #score {
+            color: white;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Score: 0</div>
+    <canvas id="pacmanCanvas"></canvas>
+    <button onclick="resetGame()">Reset Game</button>
+    <button onclick="window.location.href='index.html'">Return to Home Page</button>
+    <audio id="background-music" src="/media/pacman.mp3" autoplay loop></audio>
+    <audio id="death-sound" src="/media/pacman_death.mp3"></audio>
+    <script>
+        const canvas = document.getElementById('pacmanCanvas');
+        const context = canvas.getContext('2d');
+        let canvasSize = Math.min(window.innerWidth, window.innerHeight) * 0.7;
+        canvas.width = canvasSize;
+        canvas.height = canvasSize;
+
+        let pacman = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: canvas.width / 40,
+            angle: 0.2,
+            speed: canvas.width / 350,
+            direction: 'right'
+        };
+        let ghosts = [
+            { x: canvas.width / 8, y: canvas.height / 8, radius: canvas.width / 40, color: 'red', speed: canvas.width / 600 },
+            { x: 7 * canvas.width / 8, y: canvas.height / 8, radius: canvas.width / 40, color: 'pink', speed: canvas.width / 600 },
+            { x: canvas.width / 8, y: 7 * canvas.height / 8, radius: canvas.width / 40, color: 'cyan', speed: canvas.width / 600 },
+            { x: 7 * canvas.width / 8, y: 7 * canvas.height / 8, radius: canvas.width / 40, color: 'orange', speed: canvas.width / 600 }
+        ];
+        let points = [];
+        let score = 0;
+        let gameOver = false;
+
+        function drawPacman() {
+            context.fillStyle = 'yellow';
+            context.beginPath();
+            context.arc(pacman.x, pacman.y, pacman.radius, pacman.angle * Math.PI, (2 - pacman.angle) * Math.PI);
+            context.lineTo(pacman.x, pacman.y);
+            context.fill();
+        }
+
+        function drawGhosts() {
+            ghosts.forEach(ghost => {
+                context.fillStyle = ghost.color;
+                context.beginPath();
+                context.arc(ghost.x, ghost.y, ghost.radius, 0, 2 * Math.PI);
+                context.fill();
+            });
+        }
+
+        function drawPoints() {
+            points.forEach(point => {
+                context.fillStyle = 'white';
+                context.beginPath();
+                context.arc(point.x, point.y, point.radius, 0, 2 * Math.PI);
+                context.fill();
+            });
+        }
+
+        function updatePacman() {
+            switch (pacman.direction) {
+                case 'right':
+                    pacman.x += pacman.speed;
+                    if (pacman.x + pacman.radius > canvas.width) pacman.x = pacman.radius;
+                    break;
+                case 'left':
+                    pacman.x -= pacman.speed;
+                    if (pacman.x - pacman.radius < 0) pacman.x = canvas.width - pacman.radius;
+                    break;
+                case 'up':
+                    pacman.y -= pacman.speed;
+                    if (pacman.y - pacman.radius < 0) pacman.y = canvas.height - pacman.radius;
+                    break;
+                case 'down':
+                    pacman.y += pacman.speed;
+                    if (pacman.y + pacman.radius > canvas.height) pacman.y = pacman.radius;
+                    break;
+            }
+        }
+
+        function updateGhosts() {
+            ghosts.forEach(ghost => {
+                if (ghost.x < pacman.x) ghost.x += ghost.speed;
+                if (ghost.x > pacman.x) ghost.x -= ghost.speed;
+                if (ghost.y < pacman.y) ghost.y += ghost.speed;
+                if (ghost.y > pacman.y) ghost.y -= ghost.speed;
+            });
+
+            for (let i = 0; i < ghosts.length; i++) {
+                for (let j = i + 1; j < ghosts.length; j++) {
+                    const dx = ghosts[j].x - ghosts[i].x;
+                    const dy = ghosts[j].y - ghosts[i].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const minDistance = ghosts[i].radius + ghosts[j].radius;
+
+                    if (distance < minDistance) {
+                        const angle = Math.atan2(dy, dx);
+                        const overlap = minDistance - distance;
+                        const moveX = Math.cos(angle) * overlap / 2;
+                        const moveY = Math.sin(angle) * overlap / 2;
+
+                        ghosts[i].x -= moveX;
+                        ghosts[i].y -= moveY;
+                        ghosts[j].x += moveX;
+                        ghosts[j].y += moveY;
+                    }
+                }
+            }
+        }
+
+        function checkCollision() {
+            return ghosts.some(ghost => {
+                const dx = ghost.x - pacman.x;
+                const dy = ghost.y - pacman.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                return distance < ghost.radius + pacman.radius;
+            });
+        }
+
+        function checkPointCollision() {
+            points = points.filter(point => {
+                const dx = point.x - pacman.x;
+                const dy = point.y - pacman.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < point.radius + pacman.radius) {
+                    score++;
+                    document.getElementById('score').textContent = `Score: ${score}`;
+                    if (score % 2 === 0) {
+                        addGhost();
+                    }
+                    return false;
+                }
+                return true;
+            });
+
+            while (points.length < 5) {
+                addPoint();
+            }
+        }
+
+        function addGhost() {
+            const newGhost = {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: canvas.width / 40,
+                color: 'purple',
+                speed: canvas.width / 800
+            };
+            ghosts.push(newGhost);
+        }
+
+        function addPoint() {
+            const newPoint = {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: canvas.width / 80
+            };
+            points.push(newPoint);
+        }
+
+        function gameLoop() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            if (gameOver) {
+                context.fillStyle = 'red';
+                context.font = '48px Arial';
+                context.textAlign = 'center';
+                context.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);
+                document.getElementById('background-music').pause();
+                document.getElementById('death-sound').play();
+                return;
+            }
+            updatePacman();
+            updateGhosts();
+            drawPacman();
+            drawGhosts();
+            drawPoints();
+            checkPointCollision();
+            if (checkCollision()) {
+                gameOver = true;
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function resetGame() {
+            pacman = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                radius: canvas.width / 40,
+                angle: 0.2,
+                speed: canvas.width / 350,
+                direction: 'right'
+            };
+            ghosts = [
+                { x: canvas.width / 8, y: canvas.height / 8, radius: canvas.width / 40, color: 'red', speed: canvas.width / 800 },
+                { x: 7 * canvas.width / 8, y: canvas.height / 8, radius: canvas.width / 40, color: 'pink', speed: canvas.width / 800 },
+                { x: canvas.width / 8, y: 7 * canvas.height / 8, radius: canvas.width / 40, color: 'cyan', speed: canvas.width / 800 },
+                { x: 7 * canvas.width / 8, y: 7 * canvas.height / 8, radius: canvas.width / 40, color: 'orange', speed: canvas.width / 800 }
+            ];
+            points = [];
+            score = 0;
+            document.getElementById('score').textContent = `Score: ${score}`;
+            gameOver = false;
+            for (let i = 0; i < 5; i++) {
+                addPoint();
+            }
+            document.getElementById('background-music').play();
+            gameLoop();
+        }
+
+        document.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case 'ArrowRight':
+                    pacman.direction = 'right';
+                    break;
+                case 'ArrowLeft':
+                    pacman.direction = 'left';
+                    break;
+                case 'ArrowUp':
+                    pacman.direction = 'up';
+                    break;
+                case 'ArrowDown':
+                    pacman.direction = 'down';
+                    break;
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            canvasSize = Math.min(window.innerWidth, window.innerHeight) * 0.7;
+            canvas.width = canvasSize;
+            canvas.height = canvasSize;
+            resetGame();
+        });
+
+        resetGame();
+    </script>
+</body>
+</html>
